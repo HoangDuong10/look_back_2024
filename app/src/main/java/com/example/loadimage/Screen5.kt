@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -132,6 +133,17 @@ fun Screen5(
             config = config.reset()
             data.currentStep-=1
             previousScreen.invoke()
+    }
+
+    LaunchedEffect(isVideoPlaying) {
+        if (exoPlayer.currentPosition > 0L && isVideoPlaying) {
+            delay(2000 - exoPlayer.currentPosition)
+            isVisibleText1 = true
+
+        } else if (exoPlayer.currentPosition == 0L ) {
+            delay(2000)
+            isVisibleText1 = true
+        }
     }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -252,7 +264,7 @@ fun Screen5(
         }
 
         Box(
-            modifier = Modifier
+            modifier = Modifier.padding(top=6.dp)
                 .constrainAs(text2) {
                     top.linkTo(text1.bottom)
                     start.linkTo(parent.start)
@@ -274,32 +286,10 @@ fun Screen5(
                     isVisibleText3 = true
                 }
                 Text(
-                    text = buildAnnotatedString {
-                        withStyle(
-                            style = ParagraphStyle(lineHeight = 24.sp)
-                        ) {
-                            pushStyle(
-                                SpanStyle(
-                                    fontWeight = FontWeight.Medium,
-                                    fontSize = 40.sp,
-                                    color = Color.Green,
-                                )
-                            )
-                            append(data.data?.name)
-                            pop()
-//                            append("\n")
-//                            pushStyle(
-//                                SpanStyle(
-//                                    fontWeight = FontWeight.Medium,
-//                                    fontSize = 24.sp,
-//                                    color = Color.Green,
-//                                )
-//                            )
-//                            append("VNĐ")
-//                            pop()
-                        }
-                    },
-                    textAlign = TextAlign.Center
+                    text = data.data?.name?:"",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 40.sp,
+                    color = colorResource(R.color.main_color),
                 )
 
             }
@@ -362,16 +352,5 @@ fun Screen5(
             videoUris.toInt() + 4000,
             goToNextScreen
         )
-        LaunchedEffect(isVideoPlaying) {
-            if (exoPlayer.currentPosition > 0L && isVideoPlaying) {
-                delay(2000 - exoPlayer.currentPosition)
-                isVisibleText1 = true
-
-            } else if (exoPlayer.currentPosition == 0L ) {
-                delay(2000)
-                isVisibleText1 = true
-            }
-        }
-
     }
 }

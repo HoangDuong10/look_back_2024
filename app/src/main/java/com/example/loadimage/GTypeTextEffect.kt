@@ -91,7 +91,7 @@ fun GTypewriterTextEffect(
             while (currentIndex < text.length) {
                 displayedText += text[currentIndex]
                 currentIndex++
-                delay(30)
+                delay(25)
             }
         }
         onEffectCompleted()

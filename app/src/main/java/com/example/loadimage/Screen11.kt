@@ -30,6 +30,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -69,6 +70,7 @@ fun Screen11(
     var isVisibleText3 by remember { mutableStateOf(false) }
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
+    val colorMain = colorResource(R.color.main_color)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man11}")
@@ -85,11 +87,9 @@ fun Screen11(
         ExoPlayer.Builder(context).build()
     }
     val goToNextScreen = {
-
         config = config.reset()
         data.currentStep += 1
         nextScreen.invoke()
-
     }
     exoPlayer.addListener(object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -115,6 +115,17 @@ fun Screen11(
         config = config.reset()
         data.currentStep -= 1
         previousScreen.invoke()
+    }
+
+    LaunchedEffect(isPlayVideo) {
+        if (exoPlayer.currentPosition > 0L && isPlayVideo) {
+            delay(1800 - exoPlayer.currentPosition)
+            isVisibleText1 = true
+
+        } else if (exoPlayer.currentPosition == 0L) {
+            delay(1800)
+            isVisibleText1 = true
+        }
     }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -222,9 +233,9 @@ fun Screen11(
                     "Người Kiến Tạo\nDoanh Số",
                     textHighLight = listOf("Người Kiến Tạo\n" + "Doanh Số"),
                     configTextHighLight = ConfigTextWriter(
-                        Color.Green,
+                        colorMain,
                         30.sp,
-                        FontWeight.Medium
+                        FontWeight.Bold
                     ),
                     configTextNormal = ConfigTextWriter(
                         Color.Black,
@@ -265,7 +276,7 @@ fun Screen11(
                     "chính là bạn",
                     textHighLight = listOf(),
                     configTextHighLight = ConfigTextWriter(
-                        Color.Green,
+                        colorMain,
                         30.sp,
                         FontWeight.Medium
                     ),
@@ -306,7 +317,7 @@ fun Screen11(
                     "2024 trọn vẹn,\nnhững dấu ấn khó quên",
                     textHighLight = listOf("10.000.000"),
                     configTextHighLight = ConfigTextWriter(
-                        Color.Green,
+                        colorMain,
                         30.sp,
                         FontWeight.Medium
                     ),
@@ -343,8 +354,9 @@ fun Screen11(
                 Text(
                     text = "2025 hứa hẹn,\nnhững khoảnh khắc rực rỡ",
                     fontSize = 24.sp,
-                    color = Color.Green,
-                    textAlign = TextAlign.Center
+                    color = colorMain,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium
                 )
 
 
@@ -361,19 +373,9 @@ fun Screen11(
             ReminderConstants.TOTAL_STEPS,
             data.currentStep,
             config,
-            videoUris.toInt() + 4000,
+            videoUris.toInt() + 2000,
             goToNextScreen
         )
-        LaunchedEffect(isPlayVideo) {
-            if (exoPlayer.currentPosition > 0L && isPlayVideo) {
-                delay(2000 - exoPlayer.currentPosition)
-                isVisibleText1 = true
-
-            } else if (exoPlayer.currentPosition == 0L) {
-                delay(2000)
-                isVisibleText1 = true
-            }
-        }
 
     }
 }

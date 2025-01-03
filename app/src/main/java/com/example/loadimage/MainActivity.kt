@@ -23,57 +23,33 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 import androidx.compose.material3.Button
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -87,17 +63,13 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navArgument
-import com.example.loadimage.ui.theme.LoadImageTheme
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -139,7 +111,7 @@ class MainActivity : ComponentActivity() {
                 order = "12345",
                 topNhaBan = "Top 100",
                 doanhthu = "100,000,000",
-                thang = "10",
+                thang = "6",
                 name = "John Doe",
                 slKhachHang = "150",
                 topYeuThich = "Top 100",
@@ -154,18 +126,18 @@ class MainActivity : ComponentActivity() {
                 data = fakeData
             )
             NavHost(navController = navController, startDestination = "screen1") {
-                composable("screen1") {
-                    MultiLinearDeterminateIndicator(
+                composable(LookBackNavigation.Screen1.route) {
+                    Screen1(
                         modifier = Modifier,
                         nextScreen = {
                             val jsonData = Gson().toJson(navigationData)
-                            navController.navigate("screen2/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen2.route}/$jsonData")
                         },
                         dataNavigation =  navigationData
                     )
                 }
                 composable(
-                    "screen2/{data}",
+                    "${LookBackNavigation.Screen2.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -173,11 +145,11 @@ class MainActivity : ComponentActivity() {
                     Screen2 (
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen3/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen3.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen1")
+                            navController.navigate("${LookBackNavigation.Screen1.route}")
                         },
                         data = reminderData
                     )
@@ -185,7 +157,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable(
-                    "screen3/{data}",
+                    "${LookBackNavigation.Screen3.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -193,18 +165,18 @@ class MainActivity : ComponentActivity() {
                     Screen3(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen4/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen4.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen2/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen2.route}/$jsonData")
                         },
                         data = reminderData
                     )
 
                 }
                 composable(
-                    "screen4/{data}",
+                    "${LookBackNavigation.Screen4.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -212,18 +184,18 @@ class MainActivity : ComponentActivity() {
                     Screen4(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen5/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen5.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen3/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen3.route}/$jsonData")
                         },
                         data = reminderData
                     )
 
                 }
                 composable(
-                    "screen5/{data}",
+                    "${LookBackNavigation.Screen5.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -231,18 +203,18 @@ class MainActivity : ComponentActivity() {
                     Screen5(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen6/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen6.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen4/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen4.route}/$jsonData")
                         },
                         data = reminderData
                     )
 
                 }
                 composable(
-                    "screen6/{data}",
+                    "${LookBackNavigation.Screen6.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -250,18 +222,18 @@ class MainActivity : ComponentActivity() {
                     Screen6(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen7/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen7.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen5/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen5.route}/$jsonData")
                         },
                         data = reminderData
                     )
 
                 }
                 composable(
-                    "screen7/{data}",
+                    "${LookBackNavigation.Screen7.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -269,11 +241,11 @@ class MainActivity : ComponentActivity() {
                     Screen7(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen8/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen8.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen6/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen6.route}/$jsonData")
                         },
                         data = reminderData
                     )
@@ -281,7 +253,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable(
-                    "screen8/{data}",
+                    "${LookBackNavigation.Screen8.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -289,18 +261,18 @@ class MainActivity : ComponentActivity() {
                     Screen8(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen9/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen9.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen7/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen7.route}/$jsonData")
                         },
                         data = reminderData
                     )
                 }
 
                 composable(
-                    "screen9/{data}",
+                    "${LookBackNavigation.Screen9.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -308,18 +280,18 @@ class MainActivity : ComponentActivity() {
                     Screen9(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen10/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen10.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen8/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen8.route}/$jsonData")
                         },
                         data = reminderData
                     )
 
                 }
                 composable(
-                    "screen10/{data}",
+                    "${LookBackNavigation.Screen10.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -327,11 +299,11 @@ class MainActivity : ComponentActivity() {
                     Screen10(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen11/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen11.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen9/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen9.route}/$jsonData")
                         },
                         data = reminderData
                     )
@@ -339,7 +311,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable(
-                    "screen11/{data}",
+                    "${LookBackNavigation.Screen11.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
@@ -347,11 +319,11 @@ class MainActivity : ComponentActivity() {
                     Screen11(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen12/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen12.route}/$jsonData")
                         },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen10/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen10.route}/$jsonData")
                         },
                         data = reminderData
                     )
@@ -359,19 +331,15 @@ class MainActivity : ComponentActivity() {
                 }
 
                 composable(
-                    "screen12/{data}",
+                    "${LookBackNavigation.Screen12.route}/{data}",
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
                     val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
                     Screen12(
-                        nextScreen = {
-                            val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen12/$jsonData")
-                        },
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
-                            navController.navigate("screen11/$jsonData")
+                            navController.navigate("${LookBackNavigation.Screen11.route}/$jsonData")
                         },
                         data = reminderData
                     )
@@ -379,7 +347,6 @@ class MainActivity : ComponentActivity() {
                 }
 
             }
-//            AnimatedBoxWithEffect()
         }
     }
 }
@@ -395,9 +362,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun captureScreenshot(context: Context, view: View) {
     val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
-    canvas.drawColor(R.color.white)
     view.draw(canvas)
-
     val now = SimpleDateFormat("yyyy-MM-dd_HH:mm:ss", Locale.getDefault()).format(Date())
     val path = File(context.getExternalFilesDir(null), "$now.jpg")
     FileOutputStream(path).use { outputStream ->
@@ -414,14 +379,13 @@ fun captureScreenshot(context: Context, view: View) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MultiLinearDeterminateIndicator(
+fun Screen1(
     modifier: Modifier = Modifier,
     nextScreen: (Int) -> Unit,
     dataNavigation: ReminderDataNavigation
 ) {
 
     val context = LocalContext.current
-    var currentStepState by remember { mutableStateOf(dataNavigation.currentStep) }
     var isPlayVideo by remember { mutableStateOf(true) }
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man1}")
@@ -466,47 +430,12 @@ fun MultiLinearDeterminateIndicator(
             }
         }
     })
-
-//
-//    DisposableEffect(lifecycleOwner) {
-////        val observer = LifecycleEventObserver { _, event ->
-////            lifecycle = event
-////            when (event) {
-////                Lifecycle.Event.ON_PAUSE -> {
-////
-////                    if (exoPlayer.playbackState == Player.STATE_ENDED) {
-////                        Log.d("lifecycle11","onpause")
-////                        exoPlayer.seekTo(exoPlayer.duration - 1)
-////                    } else {
-////                        exoPlayer.playWhenReady = false
-////                    }
-////                }
-////                Lifecycle.Event.ON_RESUME -> {
-////                    if (exoPlayer.playbackState == Player.STATE_ENDED) {
-////                        Log.d("lifecycle11","onresum1${exoPlayer.playbackState}")
-////                        exoPlayer.seekTo(exoPlayer.duration - 1)
-////                    } else {
-////                        Log.d("lifecycle11","onresum22 ${exoPlayer.playbackState} và ${Player.STATE_ENDED}")
-////                        exoPlayer.playWhenReady = true
-////                    }
-////                }
-////                Lifecycle.Event.ON_STOP -> {
-////                    if (exoPlayer.playbackState == Player.STATE_ENDED) {
-////                        Log.d("lifecycle11","onStop")
-////                        exoPlayer.seekTo(exoPlayer.duration - 1)
-////                    } else {
-////                        exoPlayer.playWhenReady = false
-////                    }
-////                }
-////                else -> {}
-////            }
-//        }
-//        lifecycleOwner.lifecycle.addObserver(observer)
-//        onDispose {
-//            lifecycleOwner.lifecycle.removeObserver(observer)
-//        }
+//    LaunchedEffect(Unit) {
+//        dataNavigation.currentStep = 1
 //    }
-
+    LaunchedEffect(Unit) {
+        dataNavigation.currentStep = 1
+    }
     DisposableEffect(Unit) {
         exoPlayer.setMediaItem(MediaItem.fromUri("android.resource://${context.packageName}/${R.raw.man1}"))
         exoPlayer.prepare()
@@ -528,7 +457,6 @@ fun MultiLinearDeterminateIndicator(
                     Log.d("test","pause")
                     this.tryAwaitRelease()
                     isPlayVideo =true
-//                    Log.d("time223","${time}")
                     val pressEndTime = System.currentTimeMillis()
                     val totalPressTime = pressEndTime - pressStartTime
                     if (totalPressTime < 200) {
@@ -562,142 +490,10 @@ fun MultiLinearDeterminateIndicator(
                     it.player?.pause()
                     it.player?.playWhenReady = false
                 }
-//                when (lifecycle) {
-//                    Lifecycle.Event.ON_PAUSE -> {
-//                        pressStartTime = System.currentTimeMillis()
-//                        config = config.pause()
-//                        Log.d("lifecycle", "OnPause")
-//                        it.onPause()
-//                        it.player?.pause()
-//                        it.player?.playWhenReady = false
-////                        if (exoPlayer.playbackState == Player.STATE_ENDED) {
-////                            isPause = true
-////                           exoPlayer.seekTo(exoPlayer.duration-1)
-////                        }
-//                    }
-//
-//                    Lifecycle.Event.ON_RESUME -> {
-////                        config = config.resume()
-//                        val pressEndTime = System.currentTimeMillis()
-////                        Log.d("lifecycle", "Onresume")
-////                        if (exoPlayer.playbackState != Player.STATE_ENDED) {
-//                            exoPlayer.playWhenReady = true
-//                            Log.d("lifecycle11","222222")
-//                            it.onResume()
-////                        }else{
-////                            exoPlayer.seekTo(exoPlayer.duration-1)
-////                            Log.d("lifecycle11","onresumAndroid ${exoPlayer.playbackState} và ${Player.STATE_ENDED}")
-////                            Log.d("lifecycle11","1111111111")
-////                        }
-//
-//                    }
-//
-//                    Lifecycle.Event.ON_STOP -> {
-//                        Log.d("lifecycle", "Onstop")
-//                        pressStartTime = System.currentTimeMillis()
-//                        config = config.pause()
-////                        Log.d("lifecycle", "OnPause")
-//                        it.onPause()
-//                        it.player?.pause()
-//                        it.player?.playWhenReady = false
-////                        if (exoPlayer.playbackState == Player.STATE_ENDED) {
-////                            isPause = true
-////                            exoPlayer.seekTo(exoPlayer.duration-1)
-////                        }
-//                    }
-//
-//                    else -> Unit
-//                }
             }
 
         )
-//        Button(
-//            modifier = Modifier.constrainAs(btnStart){
-//                top.linkTo(parent.top)
-//                start.linkTo(parent.start)
-//                bottom.linkTo(parent.bottom)
-//                end.linkTo(parent.end)
-//            },
-//            onClick = {
-//                captureScreenshot(context, rootView)
-//            }) {
-//            Text(text = "Chia sẻ màn hình", fontSize = 30.sp)
-//        }
-//        Box(
-//            modifier = Modifier
-//                .constrainAs(textRemind) {
-//                    top.linkTo(letterTopGuideline)
-//                    start.linkTo(parent.start)
-//                    end.linkTo(parent.end)
-//                    width = Dimension.wrapContent
-//                    height = Dimension.wrapContent
-//                }
-//        ) {
-//            if(isPause){
-//                Image(
-//                    painter = painterResource(R.drawable.image1),
-//                    contentDescription = null,
-//                    modifier = Modifier.fillMaxSize()
-//                )
-//            }
-//            AnimatedVisibility(
-//                visible = isVisibleRemind ,
-//                enter = scaleIn(
-//                    initialScale = 0.2f,
-//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                ),
-//                exit = scaleOut(
-//                    targetScale = 1f,
-//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                )
-//            ) {
-//                if (this.transition.currentState == this.transition.targetState) {
-//                    isVisibleYear = true
-//                }
-//                Box() {
-//                    Text(
-//                        color = Color.White,
-//                        text = "Cùng nhìn lại",
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 34.sp
-//                    )
-//                }
-//            }
-//        }
 
-//        Box(
-//            modifier = Modifier.constrainAs(textYear) {
-//                top.linkTo(textRemind.bottom)
-//                start.linkTo(parent.start)
-//                end.linkTo(parent.end)
-//                width = Dimension.wrapContent
-//                height = Dimension.wrapContent
-//            }
-//        ) {
-//            AnimatedVisibility(
-//                visible = isVisibleYear,
-//                enter = scaleIn(
-//                    initialScale = 0.2f,
-//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                ),
-//                exit = scaleOut(
-//                    targetScale = 1f,
-//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                )
-//            ) {
-////                if (this.transition.currentState == this.transition.targetState) {
-////                    isVisibleRemind = false
-////                }
-//                Text(
-//                    text = "2023",
-//                    color = Color.Yellow,
-//                    fontSize = 48.sp,
-//                    fontWeight = FontWeight.Bold,
-//                    fontFamily = FontFamily(Font(R.font.forma_djr))
-//                )
-//
-//            }
-//        }
         GSlicedProgressBar(
             modifier = Modifier
                 .height(40.dp)
@@ -708,29 +504,12 @@ fun MultiLinearDeterminateIndicator(
                     height = Dimension.wrapContent
                 },
             ReminderConstants.TOTAL_STEPS,
-            currentStepState,
+            1,
             config,
             videoUris.toInt(),
             goToNextScreen
         )
     }
-//    LaunchedEffect(isPause) {
-////        isVisibleRemind = false
-////        isVisibleBox = false
-//        Log.d("time224","${exoPlayer.currentPosition}")
-//        if(exoPlayer.currentPosition >0L && !isPause){
-//            Log.d("time222","${exoPlayer.currentPosition}")
-//                delay(3000-exoPlayer.currentPosition)
-//                isVisibleRemind = true
-//
-//        }else if(exoPlayer.currentPosition==0L && !isPause){
-////            Log.d("time222","${time}")
-//            delay(3000)
-//            isVisibleRemind = true
-//        }
-////        delay(3000)
-////        isVisibleRemind = true
-//    }
 }
 
 @Composable

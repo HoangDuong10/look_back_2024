@@ -149,7 +149,7 @@ fun Screen4(
             var isFirstTime = true
             while (count < data.data?.thang!!.toInt()) {
                 if (isFirstTime && count == 1) {
-                    delay(1000)
+                    delay(700)
                     isFirstTime = false
                 } else {
                     delay(150)

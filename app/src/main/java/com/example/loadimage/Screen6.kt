@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -66,6 +67,7 @@ fun Screen6(
     var isVisibleText3 by remember { mutableStateOf(false) }
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
+    val mainColor = colorResource(R.color.main_color)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man6}")
@@ -266,16 +268,26 @@ fun Screen6(
                     }
                     Text(
                         text = buildAnnotatedString {
-                            withStyle(
-                                style = ParagraphStyle(lineHeight = 24.sp)
-                            ) {
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 40.sp ,color = Color.Green,))
-                                append(data.data?.slKhachHang)
-                                pop()
-                                append("\n")
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp ,color = Color.Green,))
-                                append("khách hàng")
-                                pop()
+                            withStyle(style = ParagraphStyle(lineHeight  = 24.sp)){
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 40.sp,
+                                        color = mainColor
+                                    )
+                                ) {
+                                    append("${data.data?.slKhachHang}\n")
+                                }
+
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 24.sp,
+                                        color = mainColor,
+                                    )
+                                ) {
+                                    append("khách hàng")
+                                }
                             }
                         },
                         textAlign = TextAlign.Center

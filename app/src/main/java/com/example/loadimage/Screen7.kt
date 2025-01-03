@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -53,7 +54,6 @@ import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 
-
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Screen7(
@@ -68,6 +68,7 @@ fun Screen7(
     var isVisibleText3 by remember { mutableStateOf(false) }
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
+    val colorMain = colorResource(R.color.main_color)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man7}")
@@ -85,7 +86,7 @@ fun Screen7(
     }
     val goToNextScreen = {
         config = config.reset()
-        data.currentStep+=1
+        data.currentStep += 1
         nextScreen.invoke()
     }
     exoPlayer.addListener(object : Player.Listener {
@@ -108,15 +109,25 @@ fun Screen7(
         exoPlayer.playWhenReady = true
     }
     val goToPreviousScreen = {
-            config = config.reset()
-            data.currentStep-=1
-            previousScreen.invoke()
+        config = config.reset()
+        data.currentStep -= 1
+        previousScreen.invoke()
+    }
+    LaunchedEffect(isPlayVideo) {
+        if (exoPlayer.currentPosition > 0L && isPlayVideo) {
+            delay(2000 - exoPlayer.currentPosition)
+            isVisibleText1 = true
+
+        } else if (exoPlayer.currentPosition == 0L) {
+            delay(2000)
+            isVisibleText1 = true
+        }
     }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_RESUME -> {
-                    isPlayVideo= true
+                    isPlayVideo = true
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {
@@ -202,88 +213,88 @@ fun Screen7(
 //                    height = Dimension.fillToConstraints
 //                }
 //        ) {
-            Box(
-                modifier = Modifier
-                    .constrainAs(text1) {
-                        top.linkTo(letterTopGuideline)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-            ) {
-                AnimatedVisibility(
-                    visible = isVisibleText1,
-                    enter = scaleIn(
-                        initialScale = 0.2f,
-                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-                    ),
-                    exit = scaleOut(
-                        targetScale = 1f,
-                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-                    )
-                ) {
-                    if (this.transition.currentState == this.transition.targetState) {
-                        isVisibleText2 = true
-                    }
-                    TypewriterTextEffectView(
-                        modifier = Modifier,
-                        data.data?.topYeuThich?:"",
-                        textHighLight = listOf(data.data?.topYeuThich?:""),
-                        configTextHighLight = ConfigTextWriter(
-                            Color.Green,
-                            40.sp,
-                            FontWeight.Medium
-                        ),
-                        configTextNormal = ConfigTextWriter(
-                            Color.Black,
-                            18.sp,
-                            FontWeight.Medium
-                        ),
-                        isShowFull = true,
-                        isVideoPlaying = isPlayVideo
-                    ) {
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier.constrainAs(text2) {
-                    top.linkTo(text1.bottom)
+        Box(
+            modifier = Modifier
+                .constrainAs(text1) {
+                    top.linkTo(letterTopGuideline)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }
+        ) {
+            AnimatedVisibility(
+                visible = isVisibleText1,
+                enter = scaleIn(
+                    initialScale = 0.2f,
+                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                ),
+                exit = scaleOut(
+                    targetScale = 1f,
+                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                )
             ) {
-                AnimatedVisibility(
-                    visible = isVisibleText2,
-                    enter = scaleIn(
-                        initialScale = 0.2f,
-                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                if (this.transition.currentState == this.transition.targetState) {
+                    isVisibleText2 = true
+                }
+                TypewriterTextEffectView(
+                    modifier = Modifier,
+                    data.data?.topYeuThich ?: "",
+                    textHighLight = listOf(data.data?.topYeuThich ?: ""),
+                    configTextHighLight = ConfigTextWriter(
+                        color = colorMain,
+                        40.sp,
+                        FontWeight.Bold
                     ),
-                    exit = scaleOut(
-                        targetScale = 1f,
-                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-                    )
+                    configTextNormal = ConfigTextWriter(
+                        Color.Black,
+                        18.sp,
+                        FontWeight.Medium
+                    ),
+                    isShowFull = true,
+                    isVideoPlaying = isPlayVideo
                 ) {
-                    TypewriterTextEffectView(
-                        modifier = Modifier,
-                        "nhà bán hàng được yêu thích nhất\nkhông thể thiếu bạn!Trong đó",
-                        textHighLight = listOf(),
-                        configTextHighLight = ConfigTextWriter(
-                            Color.Green,
-                            34.sp,
-                            FontWeight.Medium
-                        ),
-                        configTextNormal = ConfigTextWriter(
-                            Color.Black,
-                            18.sp,
-                            FontWeight.Medium
-                        ),
-                        isShowFull = false,
-                        isVideoPlaying = isPlayVideo
-                    ) {
-                        isVisibleText3 = true
-                    }
                 }
             }
+        }
+
+        Box(
+            modifier = Modifier.constrainAs(text2) {
+                top.linkTo(text1.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        ) {
+            AnimatedVisibility(
+                visible = isVisibleText2,
+                enter = scaleIn(
+                    initialScale = 0.2f,
+                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                ),
+                exit = scaleOut(
+                    targetScale = 1f,
+                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                )
+            ) {
+                TypewriterTextEffectView(
+                    modifier = Modifier,
+                    "nhà bán hàng được yêu thích nhất\nkhông thể thiếu bạn!Trong đó",
+                    textHighLight = listOf(),
+                    configTextHighLight = ConfigTextWriter(
+                       color = colorMain,
+                        34.sp,
+                        FontWeight.Medium
+                    ),
+                    configTextNormal = ConfigTextWriter(
+                        Color.Black,
+                        18.sp,
+                        FontWeight.Medium
+                    ),
+                    isShowFull = false,
+                    isVideoPlaying = isPlayVideo
+                ) {
+                    isVisibleText3 = true
+                }
+            }
+        }
 
 //            Box(
 //                modifier = Modifier.constrainAs(text3) {
@@ -325,47 +336,59 @@ fun Screen7(
 //                }
 //            }
 
-            Box(
-                modifier = Modifier.constrainAs(text3) {
-                    top.linkTo(text2.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            ) {
-                AnimatedVisibility(
-                    visible = isVisibleText3,
-                    enter = scaleIn(
-                        initialScale = 0.2f,
-                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-                    ),
-                    exit = scaleOut(
-                        targetScale = 1f,
-                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-                    )
-                ) {
-                    if (this.transition.currentState == this.transition.targetState) {
-                        isVisibleText4 = true
-                    }
-                    Text(
-                        text = buildAnnotatedString {
-                            withStyle(
-                                style = ParagraphStyle(lineHeight = 24.sp)
-                            ) {
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 55.sp ,color = Color.Green,))
-                                append(data.data?.khachHang)
-                                pop()
-                                append("\n")
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp ,color = Color.Green,))
-                                append("khách hàng")
-                                pop()
-                            }
-                        },
-                        textAlign = TextAlign.Center
-                    )
-
-
-                }
+        Box(
+            modifier = Modifier.constrainAs(text3) {
+                top.linkTo(text2.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
             }
+        ) {
+            AnimatedVisibility(
+                visible = isVisibleText3,
+                enter = scaleIn(
+                    initialScale = 0.2f,
+                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                ),
+                exit = scaleOut(
+                    targetScale = 1f,
+                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                )
+            ) {
+                if (this.transition.currentState == this.transition.targetState) {
+                    isVisibleText4 = true
+                }
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = ParagraphStyle(lineHeight = 24.sp)
+                        ) {
+                            pushStyle(
+                                SpanStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 55.sp,
+                                    color = colorMain,
+                                )
+                            )
+                            append(data.data?.khachHang)
+                            pop()
+                            append("\n")
+                            pushStyle(
+                                SpanStyle(
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 24.sp,
+                                    color = colorMain,
+                                )
+                            )
+                            append("khách hàng")
+                            pop()
+                        }
+                    },
+                    textAlign = TextAlign.Center
+                )
+
+
+            }
+        }
 
         Box(
             modifier = Modifier
@@ -461,16 +484,6 @@ fun Screen7(
             videoUris.toInt() + 4000,
             goToNextScreen
         )
-        LaunchedEffect(isPlayVideo) {
-            if (exoPlayer.currentPosition > 0L && isPlayVideo) {
-                delay(2000 - exoPlayer.currentPosition)
-                isVisibleText1 = true
-
-            } else if (exoPlayer.currentPosition == 0L) {
-                delay(2000)
-                isVisibleText1 = true
-            }
-        }
 
     }
 }

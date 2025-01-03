@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -78,7 +79,7 @@ fun Screen3(
             )
         )
     }
-
+    val mainColor = colorResource(R.color.main_color)
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build()
     }
@@ -263,33 +264,30 @@ fun Screen3(
                 }
                 Text(
                     text = buildAnnotatedString {
-                        withStyle(
-                            style = ParagraphStyle(lineHeight = 24.sp)
-                        ) {
-                            pushStyle(
-                                SpanStyle(
-                                    fontWeight = FontWeight.Medium,
+                        withStyle(style = ParagraphStyle(lineHeight  = 24.sp)){
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.Bold,
                                     fontSize = 40.sp,
-                                    color = Color.Green,
+                                    color = mainColor
                                 )
-                            )
-                            append(data.data?.doanhthu)
-                            pop()
-                            append("\n")
-                            pushStyle(
-                                SpanStyle(
+                            ) {
+                                append("${data.data?.doanhthu}\n")
+                            }
+
+                            withStyle(
+                                style = SpanStyle(
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 24.sp,
-                                    color = Color.Green,
+                                    color = mainColor,
                                 )
-                            )
-                            append("VNĐ")
-                            pop()
+                            ) {
+                                append("VNĐ")
+                            }
                         }
                     },
                     textAlign = TextAlign.Center
                 )
-
             }
         }
 

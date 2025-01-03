@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -52,24 +53,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
-//@Composable
-//fun Screen3(
-//    navigation: NavController,
-//    isShowFull: Boolean,
-//    steps: Int,
-//    currentStep: Int,
-//    nextScreen: (Int) -> Unit,
-//    previousScreen: (Int) -> Unit,
-//) {
-//    Screen2(
-//        modifier = Modifier,
-//        steps = steps,
-//        currentStep = currentStep,
-//        navigation,
-//        nextScreen = nextScreen,
-//        previousScreen = previousScreen
-//    )
-//}
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -85,6 +69,7 @@ fun Screen10(
     var isVisibleText3 by remember { mutableStateOf(false) }
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
+    val colorYellow = colorResource(R.color.yellow)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man10}")
@@ -154,7 +139,16 @@ fun Screen10(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+    LaunchedEffect(isPlayVideo) {
+        if (exoPlayer.currentPosition > 0L && isPlayVideo) {
+            delay(500 - exoPlayer.currentPosition)
+            isVisibleText1 = true
 
+        } else if (exoPlayer.currentPosition == 0L) {
+            delay(500)
+            isVisibleText1 = true
+        }
+    }
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -181,7 +175,7 @@ fun Screen10(
                 )
             }
     ) {
-        val (box, progress, text1, text2, text3, text4, text5) = createRefs()
+        val (box, progress, text1, text2, text3) = createRefs()
         val boxTopGuideline = createGuidelineFromTop(0.26f)
         val boxBottomGuideline = createGuidelineFromBottom(0.26f)
         val boxLeftGuideline = createGuidelineFromStart(0.12f)
@@ -209,18 +203,6 @@ fun Screen10(
                 }
             }
         )
-//        ConstraintLayout(
-//            modifier = Modifier
-//                .background(Color.Transparent)
-//                .constrainAs(box) {
-//                    top.linkTo(boxTopGuideline)
-//                    bottom.linkTo(boxBottomGuideline)
-//                    start.linkTo(boxLeftGuideline)
-//                    end.linkTo(boxRightGuideline)
-//                    width = Dimension.fillToConstraints
-//                    height = Dimension.fillToConstraints
-//                }
-//        ) {
         Box(
             modifier = Modifier
                 .constrainAs(text1) {
@@ -285,25 +267,6 @@ fun Screen10(
                 if (this.transition.currentState == this.transition.targetState) {
                     isVisibleText3 = true
                 }
-//                    TypewriterTextEffectView(
-//                        modifier = Modifier,
-//                        "10.000.000",
-//                        textHighLight = listOf("10.000.000"),
-//                        configTextHighLight = ConfigTextWriter(
-//                            Color.Green,
-//                            34.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        configTextNormal = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        isShowFull = true,
-//                        isVideoPlaying = !isPause1
-//                    ) {
-//                        isVisibleText3 = true
-//                    }
                 Text(
                     text = buildAnnotatedString {
                         withStyle(
@@ -313,7 +276,7 @@ fun Screen10(
                                 SpanStyle(
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 55.sp,
-                                    color = Color.Green,
+                                    color = colorYellow,
                                 )
                             )
                             append("${data.data?.soLanSD} lần")
@@ -323,7 +286,7 @@ fun Screen10(
                                 SpanStyle(
                                     fontWeight = FontWeight.Medium,
                                     fontSize = 20.sp,
-                                    color = Color.Green,
+                                    color = colorYellow,
                                 )
                             )
                             append("sử dụng các dịch vụ GTGT")
@@ -335,46 +298,6 @@ fun Screen10(
 
             }
         }
-
-//            Box(
-//                modifier = Modifier.constrainAs(text3) {
-//                    top.linkTo(text2.bottom)
-//                    start.linkTo(parent.start)
-//                    end.linkTo(parent.end)
-//                }
-//            ) {
-//                AnimatedVisibility(
-//                    visible = isVisibleText2,
-//                    enter = scaleIn(
-//                        initialScale = 0.2f,
-//                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                    ),
-//                    exit = scaleOut(
-//                        targetScale = 1f,
-//                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                    )
-//                ) {
-//                    TypewriterTextEffectView(
-//                        modifier = Modifier,
-//                        "VNĐ",
-//                        textHighLight = listOf("VNĐ"),
-//                        configTextHighLight = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        configTextNormal = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        isShowFull = true,
-//                        isVideoPlaying = !isPause1
-//                    ) {
-//                    }
-//
-//                }
-//            }
 
         Box(
             modifier = Modifier
@@ -469,19 +392,9 @@ fun Screen10(
             ReminderConstants.TOTAL_STEPS,
             data.currentStep,
             config,
-            videoUris.toInt() + 4000,
+            videoUris.toInt(),
             goToNextScreen
         )
-        LaunchedEffect(isPlayVideo) {
-            if (exoPlayer.currentPosition > 0L && isPlayVideo) {
-                delay(2000 - exoPlayer.currentPosition)
-                isVisibleText1 = true
-
-            } else if (exoPlayer.currentPosition == 0L) {
-                delay(2000)
-                isVisibleText1 = true
-            }
-        }
 
     }
 }

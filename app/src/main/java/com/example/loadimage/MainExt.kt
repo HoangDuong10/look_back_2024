@@ -1,9 +1,15 @@
 package com.example.loadimage
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
@@ -80,3 +86,34 @@ fun saveImageToCache(context: Context, bitmap: Bitmap): Uri? {
         null
     }
 }
+
+@Composable
+fun rememberShareLauncher(
+    context: Context,
+    onResult: (Boolean) -> Unit
+): ManagedActivityResultLauncher<Intent, ActivityResult> {
+    return rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_CANCELED) {
+            onResult(false)
+        } else {
+            onResult(true)
+        }
+    }
+}
+
+fun shareImage(
+    context: Context,
+    shareLauncher: ManagedActivityResultLauncher<Intent, ActivityResult>,
+    imageUri: Uri,
+    title: String = "Chia sẻ qua"
+) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "image/png"
+        putExtra(Intent.EXTRA_STREAM, imageUri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    shareLauncher.launch(Intent.createChooser(shareIntent, title))
+}
+

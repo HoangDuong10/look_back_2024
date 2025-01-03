@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,12 +34,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
@@ -69,7 +75,6 @@ import kotlin.random.Random
 @Composable
 fun Screen12(
     modifier: Modifier = Modifier,
-    nextScreen: () -> Unit,
     previousScreen: () -> Unit,
     data: ReminderDataNavigation
 ) {
@@ -82,8 +87,6 @@ fun Screen12(
     var isVisibleImage4 by remember { mutableStateOf(false) }
     var isVisibleImage5 by remember { mutableStateOf(false) }
     var isVisibleImage6 by remember { mutableStateOf(false) }
-    var isVisibleText3 by remember { mutableStateOf(false) }
-    var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
@@ -151,7 +154,16 @@ fun Screen12(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+    LaunchedEffect(isPlayVideo) {
+        if (exoPlayer.currentPosition > 0L && isPlayVideo) {
+            delay(1700 - exoPlayer.currentPosition)
+            isVisibleText1 = true
 
+        } else if (exoPlayer.currentPosition == 0L) {
+            delay(1700)
+            isVisibleText1 = true
+        }
+    }
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
@@ -178,10 +190,13 @@ fun Screen12(
                 )
             }
     ) {
-        val (progress, text1, text2, textHighlight) = createRefs()
+        val (progress, text1, text2, textHighlight,btnShare) = createRefs()
         val letter1TopGuideline = createGuidelineFromTop(0.23f)
         val letter2TopGuideline = createGuidelineFromTop(0.3f)
         val letterStartGuideline = createGuidelineFromStart(0.2f)
+        val buttonEndGuideline = createGuidelineFromEnd(0.14f)
+        val buttonStartGuideline = createGuidelineFromStart(0.14f)
+        val buttonBottomGuideline = createGuidelineFromBottom(0.12f)
         val textHighlightTopGuideline = createGuidelineFromTop(0.38f)
         AndroidView(
             factory = {
@@ -217,11 +232,9 @@ fun Screen12(
                 visible = isVisibleText1,
                 enter = scaleIn(
                     initialScale = 0.6f,
-//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
                 ),
                 exit = scaleOut(
                     targetScale = 1f,
-//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
                 )
             ) {
                 TypewriterTextEffectView(
@@ -229,9 +242,10 @@ fun Screen12(
                     "Người Kiến Tạo Doanh Số",
                     textHighLight = listOf("Người Kiến Tạo Doanh Số"),
                     configTextHighLight = ConfigTextWriter(
-                        Color.Green,
+                        color = colorResource(R.color.main_color
+                        ),
                         24.sp,
-                        FontWeight.Medium
+                        FontWeight.Bold
                     ),
                     configTextNormal = ConfigTextWriter(
                         Color.Black,
@@ -342,7 +356,43 @@ fun Screen12(
                 displayText = {}
             )
         }
+        Box(
+            modifier = Modifier.fillMaxWidth().constrainAs(btnShare){
+                bottom.linkTo(buttonBottomGuideline)
+                start.linkTo(buttonStartGuideline)
+                end.linkTo(buttonEndGuideline)
+                width = Dimension.fillToConstraints
+            }
+        ) {
+            AnimatedVisibility(
+                visible = isVisibleText1,
+                enter = scaleIn(
+                    initialScale = 0.6f,
+//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                ),
+                exit = scaleOut(
+                    targetScale = 1f,
+//                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                )
+            ) {
+                Button(
+                    onClick = {},
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(id = R.color.main_color),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Chia sẻ",
+                        fontSize = 20.sp,
+                        color = Color.White
+                    )
+                }
+            }
 
+        }
         GSlicedProgressBar(
             modifier = Modifier
                 .height(40.dp)
@@ -354,107 +404,13 @@ fun Screen12(
             ReminderConstants.TOTAL_STEPS,
             data.currentStep,
             config,
-            videoUris.toInt() + 4000,
+            videoUris.toInt() + 2000,
             goToNextScreen
         )
-        LaunchedEffect(isPlayVideo) {
-            if (exoPlayer.currentPosition > 0L && isPlayVideo) {
-                delay(1700 - exoPlayer.currentPosition)
-                isVisibleText1 = true
-
-            } else if (exoPlayer.currentPosition == 0L) {
-                delay(1700)
-                isVisibleText1 = true
-            }
-        }
 
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//@Composable
-//fun HighlightItem(
-//    isVisibleImage : Boolean = false,
-//    isPlayVideo : Boolean,
-//    textNormal : String,
-//    textHighLight : String,
-//    displayText : () -> Unit
-//){
-//    var isVisibleText by remember { mutableStateOf(false) }
-//    ConstraintLayout (modifier = Modifier.padding(6.dp)){
-//        val (ivCheck,tvValue) = createRefs()
-//          Box(
-//              modifier = Modifier.constrainAs(ivCheck){
-//                  top.linkTo(parent.top)
-//                  start.linkTo(parent.start)
-//              }
-//          ){
-//              AnimatedVisibility(
-//                  visible = isVisibleImage,
-//                  enter = scaleIn(
-//                      initialScale = 0.2f,
-//                      animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                  ),
-//                  exit = scaleOut(
-//                      targetScale = 1f,
-//                      animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                  )
-//              ) {
-//                  if (this.transition.currentState == this.transition.targetState) {
-//                      isVisibleText = true
-//                  }
-//                  Icon(
-//                      painter = painterResource(R.drawable.ic_check),
-//                      contentDescription = null,
-//                      tint = Color.Unspecified,
-//                      modifier = Modifier.size(22.dp)
-//                  )
-//              }
-//          }
-//           Box(
-//               modifier = Modifier.padding(start = 4.dp).constrainAs(tvValue){
-//                   top.linkTo(ivCheck.top)
-//                   start.linkTo(ivCheck.end)
-//                   bottom.linkTo(ivCheck.bottom)
-//                   height = Dimension.fillToConstraints
-//               }
-//           ){
-//               AnimatedVisibility(
-//                   visible = isVisibleText,
-//                   enter = scaleIn(
-//                       initialScale = 0.2f,
-//                       animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                   ),
-//                   exit = scaleOut(
-//                       targetScale = 1f,
-//                       animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                   )
-//               ) {
-//                   TypewriterTextEffectView(
-//                       modifier = Modifier,
-//                       textNormal,
-//                       textHighLight = listOf(textHighLight),
-//                       configTextHighLight = ConfigTextWriter(
-//                           Color.Green,
-//                           20.sp,
-//                           FontWeight.Medium
-//                       ),
-//                       configTextNormal = ConfigTextWriter(
-//                           Color.Black,
-//                           20.sp,
-//                           FontWeight.Normal
-//                       ),
-//                       textAlign = TextAlign.Start,
-//                       isShowFull = false,
-//                       isVideoPlaying = isPlayVideo
-//                   ) {
-//                       displayText.invoke()
-//                   }
-//               }
-//           }
-//       }
-//}
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HighlightItem(
     isVisibleImage: Boolean = false,
@@ -484,9 +440,9 @@ fun HighlightItem(
                     textNormal,
                     textHighLight = listOf(textHighLight),
                     configTextHighLight = ConfigTextWriter(
-                        Color.Green,
+                        Color.Black,
                         20.sp,
-                        FontWeight.Medium
+                        FontWeight.Bold
                     ),
                     configTextNormal = ConfigTextWriter(
                         Color.Black,

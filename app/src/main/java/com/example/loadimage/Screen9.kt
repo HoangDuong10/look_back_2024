@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -85,6 +86,7 @@ fun Screen9(
     var isVisibleText3 by remember { mutableStateOf(false) }
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
+    val colorMain = colorResource(R.color.main_color)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man8}")
@@ -152,6 +154,17 @@ fun Screen9(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    LaunchedEffect(isPlayVideo) {
+        if (exoPlayer.currentPosition > 0L && isPlayVideo) {
+            delay(2000 - exoPlayer.currentPosition)
+            isVisibleText1 = true
+
+        } else if (exoPlayer.currentPosition == 0L) {
+            delay(2000)
+            isVisibleText1 = true
         }
     }
 
@@ -283,35 +296,16 @@ fun Screen9(
                     if (this.transition.currentState == this.transition.targetState) {
                         isVisibleText3 = true
                     }
-//                    TypewriterTextEffectView(
-//                        modifier = Modifier,
-//                        "10.000.000",
-//                        textHighLight = listOf("10.000.000"),
-//                        configTextHighLight = ConfigTextWriter(
-//                            Color.Green,
-//                            34.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        configTextNormal = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        isShowFull = true,
-//                        isVideoPlaying = !isPause1
-//                    ) {
-//                        isVisibleText3 = true
-//                    }
                     Text(
                         text = buildAnnotatedString {
                             withStyle(
                                 style = ParagraphStyle(lineHeight = 24.sp)
                             ) {
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 40.sp ,color = Color.Green,))
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 40.sp ,color = colorMain))
                                 append(data.data?.danhGiaCuaBan)
                                 pop()
                                 append("\n")
-                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp ,color = Color.Green,))
+                                pushStyle(SpanStyle(fontWeight = FontWeight.Medium, fontSize = 24.sp ,color = colorMain))
                                 append("đánh giá")
                                 pop()
                             }
@@ -456,16 +450,5 @@ fun Screen9(
             videoUris.toInt() + 4000,
             goToNextScreen
         )
-        LaunchedEffect(isPlayVideo) {
-            if (exoPlayer.currentPosition > 0L && isPlayVideo) {
-                delay(2000 - exoPlayer.currentPosition)
-                isVisibleText1 = true
-
-            } else if (exoPlayer.currentPosition == 0L) {
-                delay(2000)
-                isVisibleText1 = true
-            }
-        }
-
     }
 }
