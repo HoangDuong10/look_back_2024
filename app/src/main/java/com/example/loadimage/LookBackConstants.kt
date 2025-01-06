@@ -1,6 +1,6 @@
 package com.example.loadimage
 
-object ReminderConstants {
+object LookBackConstants {
     val TIME = 60
     val DURATION = 500
     val TOTAL_TIME = 5 * 1000

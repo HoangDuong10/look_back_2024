@@ -5,7 +5,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 
-data class ConfigTextWriter(
+data class ConfigText(
     var color: Color = Color.Black,
     var textSize: TextUnit = 16.sp,
     var font: FontWeight = FontWeight.Bold

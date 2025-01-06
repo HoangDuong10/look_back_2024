@@ -1,6 +1,5 @@
 package com.example.loadimage
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Text
@@ -17,7 +16,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
-import kotlin.random.Random
 
 @Composable
 fun TypewriterEffectWithVideoControl(
@@ -103,8 +101,8 @@ fun GTypewriterTextEffect(
 fun MultipleStyleText(
     displayTextComposable: String,
     listIndexHighLight: List<Pair<Int, Int>>,
-    configTextNormal: ConfigTextWriter,
-    configTextHighLight: ConfigTextWriter,
+    configTextNormal: ConfigText,
+    configTextHighLight: ConfigText,
     textAlign: TextAlign = TextAlign.Center
 ) {
     Text(
@@ -141,13 +139,13 @@ fun MultipleStyleText(
 
 
 @Composable
-fun TypewriterTextEffectView(
+fun TextEffectView(
     modifier: Modifier,
     textData: String,
     textAlign: TextAlign = TextAlign.Center,
     textHighLight: List<String>,
-    configTextNormal: ConfigTextWriter,
-    configTextHighLight: ConfigTextWriter,
+    configTextNormal: ConfigText,
+    configTextHighLight: ConfigText,
     isShowFull: Boolean = false,
     isVideoPlaying: Boolean,
     onFinish: @Composable (isFinish: Boolean) -> Unit,
@@ -161,7 +159,8 @@ fun TypewriterTextEffectView(
                 textData,
                 listIndex,
                 configTextNormal,
-                configTextHighLight
+                configTextHighLight,
+                textAlign = textAlign
             )
         } else {
             GTypewriterTextEffect(

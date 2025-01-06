@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.LoadImage" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Theme kế thừa từ Theme.AppCompat -->
+    <style name="Theme.LoadImage" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Các tùy chỉnh theme của bạn -->
+    </style>
+
 </resources>

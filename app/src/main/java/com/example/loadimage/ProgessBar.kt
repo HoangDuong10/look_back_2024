@@ -22,11 +22,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun GSlicedProgressBar(
+fun SlicedProgressBar(
     modifier: Modifier,
     steps: Int,
     currentStep: Int,
-    config: ProgressBarConfig,
+    config: ProgressConfig,
     time: Int,
     onFinished: () -> Unit
 ) {
@@ -35,15 +35,15 @@ fun GSlicedProgressBar(
     LaunchedEffect(config) {
         var isAnimateTo = false
         when (config.action) {
-            ReminderConstants.PAUSE -> {
+            LookBackConstants.PAUSE -> {
                 percent.stop()
             }
 
-            ReminderConstants.RESUME -> {
+            LookBackConstants.RESUME -> {
                 isAnimateTo = true
             }
 
-            ReminderConstants.RESET -> {
+            LookBackConstants.RESET -> {
                 percent.stop()
                 percent.snapTo(0f)
                 isAnimateTo = true

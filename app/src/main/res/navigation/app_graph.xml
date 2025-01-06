@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:startDestination="@id/lookback_fragment12"
+    android:id="@+id/app_graph">
+    <fragment
+        android:id="@+id/lookback_fragment12"
+        android:name="com.example.loadimage.LookBackFragment22">
+    </fragment>
+
+<!--    <dialog-->
+<!--        android:id="@+id/look_back"-->
+<!--        android:name="com.example.loadimage.LookBackFragment">-->
+<!--    </dialog>-->
+</navigation>

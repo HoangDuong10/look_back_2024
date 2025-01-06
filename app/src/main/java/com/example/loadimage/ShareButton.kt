@@ -28,7 +28,9 @@ import com.example.loadimage.ui.theme.LoadImageTheme
 
 @Composable
 fun ShareButton(
-    onClick: () -> Unit
+    colorBg : Color = colorResource(R.color.main_color),
+    colorText : Color = Color.White,
+    onClick: () -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -37,7 +39,7 @@ fun ShareButton(
                 onClick.invoke()
             }
             .background(
-                color = colorResource(R.color.main_color),
+                color = colorBg,
                 shape = (RoundedCornerShape(22.dp)
                         )
             )
@@ -49,24 +51,24 @@ fun ShareButton(
             modifier = Modifier
                 .padding(end = 4.dp)
                 .size(28.dp),
-            tint = Color.White
+            tint = colorText
         )
         Text(
             text = "Chia sẻ",
             fontSize = 22.sp,
-            color = Color.White
+            color = colorText
         )
     }
 }
 @Composable
 fun LoadingDialog(isLoading: Boolean) {
     if (isLoading) {
-        Dialog(onDismissRequest = {}) { // Không cho phép đóng khi loading
+        Dialog(onDismissRequest = {}) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .size(100.dp)
-                    .background(Color.Transparent, shape = RoundedCornerShape(8.dp))
+                    .background(Color.Red, shape = RoundedCornerShape(8.dp))
                     .padding(16.dp)
             ) {
                 CircularProgressIndicator()

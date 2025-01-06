@@ -120,9 +120,9 @@ class MainActivity : ComponentActivity() {
                 danhGiaCuaBan = "12",
                 soLanSD = "20"
             )
-            var navigationData = ReminderDataNavigation(
-                ReminderConstants.TOTAL_STEPS,
-                ReminderConstants.CURRENT_STEP_DEFAULT,
+            var navigationData = LookBackDataNavigation(
+                LookBackConstants.TOTAL_STEPS,
+                LookBackConstants.CURRENT_STEP_DEFAULT,
                 data = fakeData
             )
             NavHost(navController = navController, startDestination = "screen1") {
@@ -141,7 +141,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen2 (
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -161,7 +161,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen3(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -180,7 +180,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen4(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -199,7 +199,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen5(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -218,7 +218,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen6(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -237,7 +237,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen7(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -257,7 +257,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen8(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -276,7 +276,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen9(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -295,7 +295,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen10(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -315,7 +315,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen11(
                         nextScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -335,7 +335,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("data") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val json = backStackEntry.arguments?.getString("data") ?: ""
-                    val reminderData = Gson().fromJson(json, ReminderDataNavigation::class.java)
+                    val reminderData = Gson().fromJson(json, LookBackDataNavigation::class.java)
                     Screen12(
                         previousScreen = {
                             val jsonData = Gson().toJson(reminderData)
@@ -382,7 +382,7 @@ fun captureScreenshot(context: Context, view: View) {
 fun Screen1(
     modifier: Modifier = Modifier,
     nextScreen: (Int) -> Unit,
-    dataNavigation: ReminderDataNavigation
+    dataNavigation: LookBackDataNavigation
 ) {
 
     val context = LocalContext.current
@@ -391,8 +391,8 @@ fun Screen1(
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man1}")
     var config by remember {
         mutableStateOf(
-            ProgressBarConfig(
-                action = ReminderConstants.RESET,
+            ProgressConfig(
+                action = LookBackConstants.RESET,
                 configValue = Random.nextInt()
             )
         )
@@ -494,7 +494,7 @@ fun Screen1(
 
         )
 
-        GSlicedProgressBar(
+        SlicedProgressBar(
             modifier = Modifier
                 .height(40.dp)
                 .padding(18.dp, 0.dp)
@@ -503,7 +503,7 @@ fun Screen1(
                     top.linkTo(parent.top)
                     height = Dimension.wrapContent
                 },
-            ReminderConstants.TOTAL_STEPS,
+            LookBackConstants.TOTAL_STEPS,
             1,
             config,
             videoUris.toInt(),

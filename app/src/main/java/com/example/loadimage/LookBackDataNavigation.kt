@@ -1,8 +1,6 @@
 package com.example.loadimage
 
-import com.google.common.util.concurrent.FakeTimeLimiter
-
-data class ReminderDataNavigation(
+data class LookBackDataNavigation(
     val steps: Int,
     var currentStep: Int,
     var data: FakeData? = null,

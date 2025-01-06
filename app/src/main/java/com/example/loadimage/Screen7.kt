@@ -1,11 +1,12 @@
 package com.example.loadimage
 
-import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -21,26 +22,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
@@ -48,8 +52,9 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import androidx.navigation.NavController
-import com.google.gson.Gson
+import com.example.loadimage.ui.theme.LoadImageTheme
+import dev.shreyaspatil.capturable.Capturable
+import dev.shreyaspatil.capturable.controller.rememberCaptureController
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -60,7 +65,7 @@ fun Screen7(
     modifier: Modifier = Modifier,
     nextScreen: () -> Unit,
     previousScreen: () -> Unit,
-    data: ReminderDataNavigation
+    data: LookBackDataNavigation
 ) {
     val context = LocalContext.current
     var isVisibleText1 by remember { mutableStateOf(false) }
@@ -68,14 +73,15 @@ fun Screen7(
     var isVisibleText3 by remember { mutableStateOf(false) }
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
+    var isCature by remember { mutableStateOf(false) }
     val colorMain = colorResource(R.color.main_color)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
         getVideoDuration(context, "android.resource://${context.packageName}/${R.raw.man7}")
     var config by remember {
         mutableStateOf(
-            ProgressBarConfig(
-                action = ReminderConstants.RESET,
+            ProgressConfig(
+                action = LookBackConstants.RESET,
                 configValue = Random.nextInt()
             )
         )
@@ -94,6 +100,7 @@ fun Screen7(
             when (playbackState) {
                 Player.STATE_ENDED -> {
                     exoPlayer.seekTo(exoPlayer.duration)
+                    isVisibleText1 = true
                 }
             }
         }
@@ -173,11 +180,7 @@ fun Screen7(
                 )
             }
     ) {
-        val (box, progress, text1, text2, text3, text4, text5) = createRefs()
-        val boxTopGuideline = createGuidelineFromTop(0.26f)
-        val boxBottomGuideline = createGuidelineFromBottom(0.26f)
-        val boxLeftGuideline = createGuidelineFromStart(0.12f)
-        val boxRightGuideline = createGuidelineFromEnd(0.12f)
+        val (progress, text1, text2, text3, text4, ivShare) = createRefs()
         val letterTopGuideline = createGuidelineFromTop(0.43f)
         AndroidView(
             factory = {
@@ -201,18 +204,6 @@ fun Screen7(
                 }
             }
         )
-//        ConstraintLayout(
-//            modifier = Modifier
-//                .background(Color.Transparent)
-//                .constrainAs(box) {
-//                    top.linkTo(boxTopGuideline)
-//                    bottom.linkTo(boxBottomGuideline)
-//                    start.linkTo(boxLeftGuideline)
-//                    end.linkTo(boxRightGuideline)
-//                    width = Dimension.fillToConstraints
-//                    height = Dimension.fillToConstraints
-//                }
-//        ) {
         Box(
             modifier = Modifier
                 .constrainAs(text1) {
@@ -225,26 +216,26 @@ fun Screen7(
                 visible = isVisibleText1,
                 enter = scaleIn(
                     initialScale = 0.2f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 ),
                 exit = scaleOut(
                     targetScale = 1f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 )
             ) {
                 if (this.transition.currentState == this.transition.targetState) {
                     isVisibleText2 = true
                 }
-                TypewriterTextEffectView(
+                TextEffectView(
                     modifier = Modifier,
                     data.data?.topYeuThich ?: "",
                     textHighLight = listOf(data.data?.topYeuThich ?: ""),
-                    configTextHighLight = ConfigTextWriter(
+                    configTextHighLight = ConfigText(
                         color = colorMain,
                         40.sp,
                         FontWeight.Bold
                     ),
-                    configTextNormal = ConfigTextWriter(
+                    configTextNormal = ConfigText(
                         Color.Black,
                         18.sp,
                         FontWeight.Medium
@@ -267,23 +258,23 @@ fun Screen7(
                 visible = isVisibleText2,
                 enter = scaleIn(
                     initialScale = 0.2f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 ),
                 exit = scaleOut(
                     targetScale = 1f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 )
             ) {
-                TypewriterTextEffectView(
+                TextEffectView(
                     modifier = Modifier,
                     "nhà bán hàng được yêu thích nhất\nkhông thể thiếu bạn!Trong đó",
                     textHighLight = listOf(),
-                    configTextHighLight = ConfigTextWriter(
+                    configTextHighLight = ConfigText(
                        color = colorMain,
                         34.sp,
                         FontWeight.Medium
                     ),
-                    configTextNormal = ConfigTextWriter(
+                    configTextNormal = ConfigText(
                         Color.Black,
                         18.sp,
                         FontWeight.Medium
@@ -295,47 +286,6 @@ fun Screen7(
                 }
             }
         }
-
-//            Box(
-//                modifier = Modifier.constrainAs(text3) {
-//                    top.linkTo(text2.bottom)
-//                    start.linkTo(parent.start)
-//                    end.linkTo(parent.end)
-//                }
-//            ) {
-//                AnimatedVisibility(
-//                    visible = isVisibleText2,
-//                    enter = scaleIn(
-//                        initialScale = 0.2f,
-//                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                    ),
-//                    exit = scaleOut(
-//                        targetScale = 1f,
-//                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                    )
-//                ) {
-//                    TypewriterTextEffectView(
-//                        modifier = Modifier,
-//                        "VNĐ",
-//                        textHighLight = listOf("VNĐ"),
-//                        configTextHighLight = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        configTextNormal = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        isShowFull = true,
-//                        isVideoPlaying = !isPause1
-//                    ) {
-//                    }
-//
-//                }
-//            }
-
         Box(
             modifier = Modifier.constrainAs(text3) {
                 top.linkTo(text2.bottom)
@@ -347,11 +297,11 @@ fun Screen7(
                 visible = isVisibleText3,
                 enter = scaleIn(
                     initialScale = 0.2f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 ),
                 exit = scaleOut(
                     targetScale = 1f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 )
             ) {
                 if (this.transition.currentState == this.transition.targetState) {
@@ -402,23 +352,23 @@ fun Screen7(
                 visible = isVisibleText4,
                 enter = scaleIn(
                     initialScale = 0.2f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 ),
                 exit = scaleOut(
                     targetScale = 1f,
-                    animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
                 )
             ) {
-                TypewriterTextEffectView(
+                TextEffectView(
                     modifier = Modifier,
                     "Tiếp tục quay lại trải nghiệm\nsản phẩm nhiều lần",
                     textHighLight = listOf(),
-                    configTextHighLight = ConfigTextWriter(
+                    configTextHighLight = ConfigText(
                         Color.Black,
                         18.sp,
                         FontWeight.Medium
                     ),
-                    configTextNormal = ConfigTextWriter(
+                    configTextNormal = ConfigText(
                         Color.Black,
                         18.sp,
                         FontWeight.Medium
@@ -430,47 +380,7 @@ fun Screen7(
                 }
             }
         }
-//            Box(
-//                modifier = Modifier.constrainAs(text5) {
-//                    top.linkTo(text4.bottom)
-//                    start.linkTo(parent.start)
-//                    end.linkTo(parent.end)
-//                }
-//            ) {
-//                AnimatedVisibility(
-//                    visible = isVisibleText4,
-//                    enter = scaleIn(
-//                        initialScale = 0.2f,
-//                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                    ),
-//                    exit = scaleOut(
-//                        targetScale = 1f,
-//                        animationSpec = tween(durationMillis = ReminderConstants.TIME_SCREEN_1)
-//                    )
-//                ) {
-//                    TypewriterTextEffectView(
-//                        modifier = Modifier,
-//                        "Bạn lọt Top 100 nhà bán \n chốt được nhiều đơn hàng nhất!",
-//                        textHighLight = listOf("Top 100"),
-//                        configTextHighLight = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        configTextNormal = ConfigTextWriter(
-//                            Color.Black,
-//                            22.sp,
-//                            FontWeight.Medium
-//                        ),
-//                        isShowFull = false,
-//                        isVideoPlaying = !isPause1
-//                    ) {
-//                    }
-//
-//                }
-//            }
-//        }
-        GSlicedProgressBar(
+        SlicedProgressBar(
             modifier = Modifier
                 .height(40.dp)
                 .padding(18.dp, 0.dp)
@@ -478,12 +388,312 @@ fun Screen7(
                 .constrainAs(progress) {
                     top.linkTo(parent.top)
                 },
-            ReminderConstants.TOTAL_STEPS,
+            LookBackConstants.TOTAL_STEPS,
             data.currentStep,
             config,
             videoUris.toInt() + 4000,
             goToNextScreen
         )
 
+        Box(
+            modifier = Modifier.constrainAs(ivShare) {
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                bottom.linkTo(parent.bottom, margin = 22.dp)
+            }
+        ) {
+            AnimatedVisibility(
+                visible = isVisibleText1,
+                enter = scaleIn(
+                    initialScale = 0.2f,
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                ),
+                exit = scaleOut(
+                    targetScale = 1f,
+                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                )
+            ) {
+                ShareButton {
+                    isCature = true
+                    isPlayVideo = false
+                }
+            }
+        }
+
+    }
+    if(isCature){
+        CaptureScreenshotScreen7(
+            data = data,
+            showPopupScreen = {isCature = false},
+        )
+    }
+}
+
+@Composable
+fun CaptureScreenshotScreen7(
+    data: LookBackDataNavigation,
+    showPopupScreen: (Boolean) -> Unit
+) {
+    val captureController = rememberCaptureController()
+    val context = LocalContext.current
+    var isLayoutReady by remember { mutableStateOf(false) }
+    val colorMain = colorResource(R.color.main_color)
+    val shareLauncher = rememberShareLauncher(context) { success ->
+        showPopupScreen(success)
+    }
+    if (isLayoutReady) {
+        LaunchedEffect(Unit) {
+            captureController.capture()
+        }
+    }
+    Popup {
+        Capturable(
+            onCaptured = { imageBitmap, _ ->
+                val bitmap = imageBitmap?.asAndroidBitmap()
+                if (bitmap != null) {
+                    val imageUri = saveImageToCache(context, bitmap)
+                    if (imageUri != null) {
+                        shareImage(context, shareLauncher, imageUri)
+                    } else {
+                        Toast.makeText(context, "Không thể lưu ảnh!", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            },
+            controller = captureController
+        ) {
+            ConstraintLayout(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned {
+                        isLayoutReady = true
+                    }
+            ) {
+                val (progress, text1, text2, text3, text4) = createRefs()
+                val letterTopGuideline = createGuidelineFromTop(0.43f)
+                Image(
+                    painter = painterResource(R.drawable.bg7),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds,
+                    alignment = Alignment.Center
+                )
+                Box(
+                    modifier = Modifier
+                        .constrainAs(text1) {
+                            top.linkTo(letterTopGuideline)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                ) {
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = scaleIn(
+                            initialScale = 0.2f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        ),
+                        exit = scaleOut(
+                            targetScale = 1f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        )
+                    ) {
+                        TextEffectView(
+                            modifier = Modifier,
+                            data.data?.topYeuThich ?: "",
+                            textHighLight = listOf(data.data?.topYeuThich ?: ""),
+                            configTextHighLight = ConfigText(
+                                color = colorMain,
+                                40.sp,
+                                FontWeight.Bold
+                            ),
+                            configTextNormal = ConfigText(
+                                Color.Black,
+                                18.sp,
+                                FontWeight.Medium
+                            ),
+                            isShowFull = true,
+                            isVideoPlaying = true
+                        ) {
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier.constrainAs(text2) {
+                        top.linkTo(text1.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                ) {
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = scaleIn(
+                            initialScale = 0.2f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        ),
+                        exit = scaleOut(
+                            targetScale = 1f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        )
+                    ) {
+                        TextEffectView(
+                            modifier = Modifier,
+                            "nhà bán hàng được yêu thích nhất\nkhông thể thiếu bạn!Trong đó",
+                            textHighLight = listOf(),
+                            configTextHighLight = ConfigText(
+                                color = colorMain,
+                                34.sp,
+                                FontWeight.Medium
+                            ),
+                            configTextNormal = ConfigText(
+                                Color.Black,
+                                18.sp,
+                                FontWeight.Medium
+                            ),
+                            isShowFull = true,
+                            isVideoPlaying = true
+                        ) {
+
+                        }
+                    }
+                }
+
+
+                Box(
+                    modifier = Modifier.constrainAs(text3) {
+                        top.linkTo(text2.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                ) {
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = scaleIn(
+                            initialScale = 0.2f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        ),
+                        exit = scaleOut(
+                            targetScale = 1f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        )
+                    ) {
+                        Text(
+                            text = buildAnnotatedString {
+                                withStyle(
+                                    style = ParagraphStyle(lineHeight = 24.sp)
+                                ) {
+                                    pushStyle(
+                                        SpanStyle(
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 55.sp,
+                                            color = colorMain,
+                                        )
+                                    )
+                                    append(data.data?.khachHang)
+                                    pop()
+                                    append("\n")
+                                    pushStyle(
+                                        SpanStyle(
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 24.sp,
+                                            color = colorMain,
+                                        )
+                                    )
+                                    append("khách hàng")
+                                    pop()
+                                }
+                            },
+                            textAlign = TextAlign.Center
+                        )
+
+
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .constrainAs(text4) {
+                            top.linkTo(text3.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                        }
+                ) {
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = scaleIn(
+                            initialScale = 0.2f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        ),
+                        exit = scaleOut(
+                            targetScale = 1f,
+                            animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                        )
+                    ) {
+                        TextEffectView(
+                            modifier = Modifier,
+                            "Tiếp tục quay lại trải nghiệm\nsản phẩm nhiều lần",
+                            textHighLight = listOf(),
+                            configTextHighLight = ConfigText(
+                                Color.Black,
+                                18.sp,
+                                FontWeight.Medium
+                            ),
+                            configTextNormal = ConfigText(
+                                Color.Black,
+                                18.sp,
+                                FontWeight.Medium
+                            ),
+                            isShowFull = true,
+                            isVideoPlaying = true
+                        ) {
+
+                        }
+                    }
+                }
+                SlicedProgressBar(
+                    modifier = Modifier
+                        .height(40.dp)
+                        .padding(18.dp, 0.dp)
+                        .fillMaxWidth()
+                        .constrainAs(progress) {
+                            top.linkTo(parent.top)
+                        },
+                    LookBackConstants.TOTAL_STEPS,
+                    data.currentStep,
+                    ProgressConfig(
+                        action = LookBackConstants.RESET,
+                        configValue = Random.nextInt()
+                    ),
+                    0,
+                    {}
+                )
+
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun Dialog7Preview(){
+    val fakeData = FakeData(
+        order = "12345",
+        topNhaBan = "Top 100",
+        doanhthu = "100,000,000",
+        thang = "6",
+        name = "John Doe",
+        slKhachHang = "150",
+        topYeuThich = "Top 100",
+        khachHang = "500",
+        danhGiaKH = "22",
+        danhGiaCuaBan = "12",
+        soLanSD = "20"
+    )
+    var navigationData = LookBackDataNavigation(
+        LookBackConstants.TOTAL_STEPS,
+        LookBackConstants.CURRENT_STEP_DEFAULT,
+        data = fakeData
+    )
+    LoadImageTheme {
+        CaptureScreenshotScreen7(data = navigationData, showPopupScreen = {})
     }
 }

@@ -35,7 +35,9 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        viewBinding = true
         compose = true
+
     }
 }
 
@@ -49,6 +51,10 @@ dependencies {
     implementation ("androidx.navigation:navigation-ui-ktx:2.7.0")
     implementation ("com.google.code.gson:gson:2.10")
     implementation ("dev.shreyaspatil:capturable:1.0.3")
+    implementation ("androidx.fragment:fragment-ktx:1.6.1")
+    implementation ("androidx.appcompat:appcompat:1.6.1")
+
+
     // Nếu bạn đang sử dụng Jetpack Compose:
     implementation ("androidx.navigation:navigation-compose:2.7.0")
     implementation(libs.androidx.core.ktx)
@@ -61,6 +67,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
