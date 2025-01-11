@@ -1,5 +1,7 @@
 package com.example.loadimage
 
+import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -8,12 +10,16 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -45,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
@@ -90,9 +97,9 @@ fun Screen3(
         ExoPlayer.Builder(context).build()
     }
     val goToNextScreen = {
-        config = config.reset()
-        data.currentStep += 1
-        nextScreen.invoke()
+//        config = config.reset()
+//        data.currentStep += 1
+//        nextScreen.invoke()
     }
     exoPlayer.addListener(object : Player.Listener {
         override fun onPlaybackStateChanged(playbackState: Int) {
@@ -124,6 +131,11 @@ fun Screen3(
             isVisibleText1 = true
         }
     }
+    var count by remember { mutableStateOf(0L) }
+    LaunchedEffect(Unit) {
+        count = System.currentTimeMillis()
+        Log.d("timetest3","${count}")
+    }
     val goToPreviousScreen = {
         config = config.reset()
         data.currentStep -= 1
@@ -153,11 +165,27 @@ fun Screen3(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-
+    var lastClickTime by remember { mutableStateOf(0L) }
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
             .background(Color.Green)
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    change.consume()
+                    val (x, y) = dragAmount
+
+                    when {
+                        y > 0 -> {
+                            if (y > 20 && x > -10 && x < 10) {
+                                (context as? Activity)?.finish()
+                            }
+                        }
+
+                        y < 0 -> {}
+                    }
+                }
+            }
             .pointerInput(Unit) {
                 val maxWidth = this.size.width
                 detectTapGestures(
@@ -168,7 +196,8 @@ fun Screen3(
                         isPlayVideo = true
                         val pressEndTime = System.currentTimeMillis()
                         val totalPressTime = pressEndTime - pressStartTime
-                        if (totalPressTime < 200) {
+                        Log.d("timetest3","${count} + ${pressStartTime} + ${pressStartTime-count}")
+                        if (totalPressTime < 200&& pressStartTime-count>1000) {
                             val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
                             if (isTapOnRightThreeQuarters) {
                                 goToNextScreen()
@@ -180,8 +209,44 @@ fun Screen3(
                 )
             }
     ) {
-        val (progress, text1, text2, text4,ivShare) = createRefs()
+//        AnimatedVisibility(
+//            visible = true,
+//            enter = scaleIn(
+//                initialScale = 0.2f,
+//                animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+//            ),
+//            exit = scaleOut(
+//                targetScale = 1f,
+//                animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+//            )
+//        ) {
+//            TextEffectView(
+//                modifier = Modifier,
+//                "Nhìn lại 2024 bạn đã có 1 \n hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                        " hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                        " hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                        " hành trình thật ấn tượng hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1",
+//                textHighLight = listOf(),
+//                configTextHighLight = ConfigText(
+//                    Color.Black,
+//                    18.sp,
+//                    FontWeight.Medium
+//                ),
+//                configTextNormal = ConfigText(
+//                    Color.Black,
+//                    18.sp,
+//                    FontWeight.Medium
+//                ),
+//                isShowFull = false,
+//                isVideoPlaying = true
+//            ) {
+//
+//            }
+//        }
+        val (progress, text1, text2, text4,ivShare,imgClose) = createRefs()
         val letterTopGuideline = createGuidelineFromTop(0.45f)
+        val letterStartGuideline = createGuidelineFromStart(0.1f)
+        val letterEndGuideline = createGuidelineFromEnd(0.1f)
         AndroidView(
             factory = {
                 PlayerView(it).apply {
@@ -248,10 +313,12 @@ fun Screen3(
         Box(
             modifier = Modifier
                 .padding(top = 12.dp)
+                .background(Color.Red)
                 .constrainAs(text2) {
                     top.linkTo(text1.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                    start.linkTo(letterStartGuideline)
+                    end.linkTo(letterEndGuideline)
+                    width = Dimension.fillToConstraints
                 }
         ) {
             AnimatedVisibility(
@@ -269,6 +336,7 @@ fun Screen3(
                     isVisibleText3 = true
                 }
                 Text(
+                    modifier = Modifier.fillMaxWidth(),
                     text = buildAnnotatedString {
                         withStyle(style = ParagraphStyle(lineHeight = 24.sp)) {
                             withStyle(
@@ -278,7 +346,7 @@ fun Screen3(
                                     color = mainColor
                                 )
                             ) {
-                                append("${data.data?.doanhthu}\n")
+                                append("${data.data?.doanhthu?.formatNumber()}\n")
                             }
 
                             withStyle(
@@ -339,6 +407,25 @@ fun Screen3(
 
             }
         }
+        IconButton(
+            onClick = {
+                (context as? Activity)?.finish()
+            },
+            modifier = Modifier
+                .constrainAs(imgClose) {
+                    top.linkTo(parent.top, 32.dp)
+                    end.linkTo(parent.end, 15.dp)
+                }
+                .size(26.dp),
+            content = {
+                Icon(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = "",
+                    tint = Color.White
+                )
+            }
+        )
         SlicedProgressBar(
             modifier = Modifier
                 .height(40.dp)
@@ -350,7 +437,7 @@ fun Screen3(
             LookBackConstants.TOTAL_STEPS,
             data.currentStep,
             config,
-            videoUris.toInt() + 4000,
+            videoUris.toInt() + 8000,
             goToNextScreen
         )
         Box(
@@ -470,7 +557,7 @@ fun CaptureScreenshotScreen3(
                                         color = mainColor
                                     )
                                 ) {
-                                    append("${data.data?.doanhthu}\n")
+                                    append("${data.data?.doanhthu?.formatNumber()}\n")
                                 }
 
                                 withStyle(
@@ -504,7 +591,6 @@ fun CaptureScreenshotScreen3(
                         fontWeight = FontWeight.Medium
                     )
                 }
-
                 SlicedProgressBar(
                     modifier = Modifier
                         .height(40.dp)
@@ -534,7 +620,7 @@ fun Dialog3Preview(){
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 1222,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

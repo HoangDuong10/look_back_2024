@@ -15,7 +15,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 
 @Composable
 fun TypewriterEffectWithVideoControl(
@@ -89,7 +91,7 @@ fun GTypewriterTextEffect(
             while (currentIndex < text.length) {
                 displayedText += text[currentIndex]
                 currentIndex++
-                delay(25)
+                delay(10)
             }
         }
         onEffectCompleted()

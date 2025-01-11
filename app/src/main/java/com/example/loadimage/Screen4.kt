@@ -1,5 +1,6 @@
 package com.example.loadimage
 
+import android.app.Activity
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
@@ -13,13 +14,17 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -127,6 +132,11 @@ fun Screen4(
             }
         }
     })
+    var count1 by remember { mutableStateOf(0L) }
+    LaunchedEffect(Unit) {
+        count1 = System.currentTimeMillis()
+        Log.d("timetest4","${count1}")
+    }
     val goToNextScreen = {
         config = config.reset()
         data.currentStep += 1
@@ -151,7 +161,7 @@ fun Screen4(
     LaunchedEffect(isPlayVideo) {
         if (isPlayVideo) {
             var isFirstTime = true
-            while (count < data.data?.thang!!.toInt()) {
+            while (count < data.data?.thang!!.toInt() && data.data?.thang!!.toInt() !=1) {
                 if (isFirstTime && count == 1) {
                     delay(700)
                     isFirstTime = false
@@ -166,14 +176,15 @@ fun Screen4(
         if (exoPlayer.currentPosition > 0L && isPlayVideo) {
             delay(data.data?.thang!!.toInt() * 150 + 500 - exoPlayer.currentPosition)
             isVisibleText = true
-
+        }else if(exoPlayer.currentPosition == 0L){
+            isVisibleText = true
         }
     }
     LaunchedEffect(Unit) {
         exoPlayer.setMediaItem(MediaItem.fromUri("android.resource://${context.packageName}/${R.raw.man4}"))
         exoPlayer.prepare()
         exoPlayer.playWhenReady = true
-        startVideo = System.currentTimeMillis()
+
     }
     val animatedGuidelineFraction by animateFloatAsState(
         targetValue = if (animation) 0.15f else 0.4f,
@@ -193,7 +204,8 @@ fun Screen4(
                         isPlayVideo = true
                         val pressEndTime = System.currentTimeMillis()
                         val totalPressTime = pressEndTime - pressStartTime
-                        if (totalPressTime < 200) {
+                        Log.d("timetest4","${count1} + ${pressStartTime} + ${pressStartTime-count1}")
+                        if (totalPressTime < 200&& pressStartTime-count1>1000) {
                             val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
                             if (isTapOnRightThreeQuarters) {
                                 goToNextScreen()
@@ -205,8 +217,42 @@ fun Screen4(
                 )
             }
     ) {
-        val (imageMonth, textTitle, progress, ivShare) = createRefs()
+        val (imageMonth, textTitle, progress, ivShare,imgClose) = createRefs()
         val boxGuideline = createGuidelineFromTop(animatedGuidelineFraction)
+//        AnimatedVisibility(
+//            visible = true,
+//            enter = scaleIn(
+//                initialScale = 0.2f,
+//                animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+//            ),
+//            exit = scaleOut(
+//                targetScale = 1f,
+//                animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+//            )
+//        ) {
+//            TextEffectView(
+//                modifier = Modifier,
+//                "Nhìn lại 2024 bạn đã có 1 \n hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                        " hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                        " hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                        " hành trình thật ấn tượng hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1",
+//                textHighLight = listOf(),
+//                configTextHighLight = ConfigText(
+//                    Color.Black,
+//                    18.sp,
+//                    FontWeight.Medium
+//                ),
+//                configTextNormal = ConfigText(
+//                    Color.Black,
+//                    18.sp,
+//                    FontWeight.Medium
+//                ),
+//                isShowFull = false,
+//                isVideoPlaying = true
+//            ) {
+//
+//            }
+//        }
         AndroidView(
             factory = {
                 PlayerView(it).apply {
@@ -231,6 +277,27 @@ fun Screen4(
             }
 
         )
+        Box(
+            modifier = Modifier
+                .constrainAs(imgClose) {
+                    top.linkTo(parent.top, 32.dp)
+                    end.linkTo(parent.end)
+                }
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    (context as? Activity)?.finish()
+                }
+        ) {
+            Icon(
+                modifier = Modifier.padding(horizontal = 15.dp).size(26.dp),
+                painter = painterResource(id = R.drawable.ic_close_reminder),
+                contentDescription = "",
+                tint = Color.White
+            )
+        }
+
         ConstraintLayout(
             modifier = Modifier
                 .background(Color.Transparent)
@@ -537,7 +604,7 @@ fun Dialog4Preview() {
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 123445,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

@@ -10,7 +10,7 @@ data class LookBackDataNavigation(
 data class FakeData(
     val order : String,
     val topNhaBan : String,
-    val doanhthu: String,
+    val doanhthu: Long,
     val thang : String,
     val name : String,
     val slKhachHang:String,

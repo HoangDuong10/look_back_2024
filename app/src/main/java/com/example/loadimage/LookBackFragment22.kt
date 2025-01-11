@@ -12,9 +12,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.gson.Gson
 
-class LookBackFragment22 : androidx.fragment.app.Fragment(){
+class LookBackFragment22 : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,11 +25,27 @@ class LookBackFragment22 : androidx.fragment.app.Fragment(){
     ): View = ComposeView(requireContext()).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
+            val bottomSheet = dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+            bottomSheet?.let {
+                val behavior = BottomSheetBehavior.from(it)
+                behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                    override fun onStateChanged(bottomSheet: View, newState: Int) {
+                        when (newState) {
+                            BottomSheetBehavior.STATE_HIDDEN -> {
+                                dismiss()
+                            }
+                        }
+                    }
+                    override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                        // Theo dõi tiến trình vuốt (slideOffset: -1.0 đến 1.0)
+                    }
+                })
+            }
             val navController = rememberNavController()
             val fakeData = FakeData(
                 order = "12345",
                 topNhaBan = "Top 100",
-                doanhthu = "100,000,000",
+                doanhthu = 123,
                 thang = "6",
                 name = "John Doe",
                 slKhachHang = "150",

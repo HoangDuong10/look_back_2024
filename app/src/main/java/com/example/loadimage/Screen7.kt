@@ -124,7 +124,6 @@ fun Screen7(
         if (exoPlayer.currentPosition > 0L && isPlayVideo) {
             delay(2000 - exoPlayer.currentPosition)
             isVisibleText1 = true
-
         } else if (exoPlayer.currentPosition == 0L) {
             delay(2000)
             isVisibleText1 = true
@@ -678,7 +677,7 @@ fun Dialog7Preview(){
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 12344,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

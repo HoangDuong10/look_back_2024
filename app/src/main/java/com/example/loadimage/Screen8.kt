@@ -604,7 +604,7 @@ fun Dialog8Preview() {
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 32323,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

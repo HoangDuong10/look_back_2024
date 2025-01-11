@@ -53,6 +53,8 @@ dependencies {
     implementation ("dev.shreyaspatil:capturable:1.0.3")
     implementation ("androidx.fragment:fragment-ktx:1.6.1")
     implementation ("androidx.appcompat:appcompat:1.6.1")
+    implementation ("com.google.accompanist:accompanist-navigation-animation:0.33.0-alpha")
+
 
 
     // Nếu bạn đang sử dụng Jetpack Compose:

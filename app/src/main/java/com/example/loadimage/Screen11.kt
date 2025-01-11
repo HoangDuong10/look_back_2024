@@ -35,14 +35,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
@@ -72,6 +76,8 @@ fun Screen11(
     var isVisibleText4 by remember { mutableStateOf(false) }
     var isPlayVideo by remember { mutableStateOf(true) }
     var isCature by remember { mutableStateOf(false) }
+    val input ="Người Kiến Tạo Doanh Số xuâất sắc"
+    val parts = input.split("Người Kiến Tạo Doanh Số")
     val colorMain = colorResource(R.color.main_color)
     val lifecycleOwner = LocalLifecycleOwner.current
     val videoUris =
@@ -179,9 +185,11 @@ fun Screen11(
                 )
             }
     ) {
-        val ( progress, text1, text2, text3, text4, ivShare) = createRefs()
-        val letter1TopGuideline = createGuidelineFromTop(0.3f)
+        val ( progress, text1, text2, text3, ivShare) = createRefs()
+        val letter1TopGuideline = createGuidelineFromTop(0.25f)
         val letter2TopGuideline = createGuidelineFromTop(0.55f)
+        val letter1StartGuideline = createGuidelineFromStart(0.1f)
+        val letter1EndGuideline = createGuidelineFromEnd(0.1f)
         AndroidView(
             factory = {
                 PlayerView(it).apply {
@@ -208,8 +216,9 @@ fun Screen11(
             modifier = Modifier
                 .constrainAs(text1) {
                     top.linkTo(letter1TopGuideline)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                    start.linkTo(letter1StartGuideline)
+                    end.linkTo(letter1EndGuideline)
+                    width = Dimension.fillToConstraints
                 }
         ) {
             AnimatedVisibility(
@@ -226,81 +235,54 @@ fun Screen11(
                 if (this.transition.currentState == this.transition.targetState) {
                     isVisibleText2 = true
                 }
-                TextEffectView(
-                    modifier = Modifier,
-                    "Người Kiến Tạo\nDoanh Số",
-                    textHighLight = listOf("Người Kiến Tạo\n" + "Doanh Số"),
-                    configTextHighLight = ConfigText(
-                        colorMain,
-                        30.sp,
-                        FontWeight.Bold
-                    ),
-                    configTextNormal = ConfigText(
-                        Color.Black,
-                        24.sp,
-                        FontWeight.Medium
-                    ),
-                    isShowFull = true,
-                    isVideoPlaying = isPlayVideo
-                ) {
-                }
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .constrainAs(text2) {
-                    top.linkTo(text1.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-        ) {
-            AnimatedVisibility(
-                visible = isVisibleText2,
-                enter = scaleIn(
-                    initialScale = 0.2f,
-                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
-                ),
-                exit = scaleOut(
-                    targetScale = 1f,
-                    animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+                Text(
+                    buildAnnotatedString {
+                        withStyle(SpanStyle(color = Color.Black, fontWeight =  FontWeight.Bold, fontSize = 24.sp)) {
+                            append(parts[0])
+                        }
+                        append("\n")
+                        withStyle(SpanStyle(color = colorMain, fontWeight =  FontWeight.Bold, fontSize = 30.sp)) {
+                            append("Người Kiến Tạo Doanh Số")
+                        }
+                        append("\n")
+                        withStyle(SpanStyle(color = Color.Black, fontWeight =  FontWeight.Bold, fontSize = 24.sp)) {
+                        append(parts[1])
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
                 )
-            ) {
-                if (this.transition.currentState == this.transition.targetState) {
-                    isVisibleText3 = true
-                }
-                TextEffectView(
-                    modifier = Modifier,
-                    "chính là bạn",
-                    textHighLight = listOf(),
-                    configTextHighLight = ConfigText(
-                        colorMain,
-                        30.sp,
-                        FontWeight.Medium
-                    ),
-                    configTextNormal = ConfigText(
-                        Color.Black,
-                        24.sp,
-                        FontWeight.Medium
-                    ),
-                    isShowFull = true,
-                    isVideoPlaying = isPlayVideo
-                ) {
-                    isVisibleText3 = true
-                }
+//                TextEffectView(
+//                    modifier = Modifier,
+//                    "Người Kiến Tạo Doanh Số chính là bạn",
+//                    textHighLight = listOf("Người Kiến Tạo Doanh Số"),
+//                    configTextHighLight = ConfigText(
+//                        colorMain,
+//                        30.sp,
+//                        FontWeight.Bold
+//                    ),
+//                    configTextNormal = ConfigText(
+//                        Color.Black,
+//                        24.sp,
+//                        FontWeight.Medium
+//                    ),
+//                    isShowFull = true,
+//                    isVideoPlaying = isPlayVideo
+//                ) {
+//                }
             }
         }
 
 
         Box(
-            modifier = Modifier.constrainAs(text3) {
+            modifier = Modifier.constrainAs(text2) {
                 top.linkTo(letter2TopGuideline)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }
         ) {
             AnimatedVisibility(
-                visible = isVisibleText3,
+                visible = isVisibleText2,
                 enter = scaleIn(
                     initialScale = 0.2f,
                     animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
@@ -327,19 +309,19 @@ fun Screen11(
                     isShowFull = false,
                     isVideoPlaying = isPlayVideo
                 ) {
-                    isVisibleText4 = true
+                    isVisibleText3 = true
                 }
             }
         }
         Box(
-            modifier = Modifier.constrainAs(text4) {
-                top.linkTo(text3.bottom, margin = 28.dp)
+            modifier = Modifier.constrainAs(text3) {
+                top.linkTo(text2.bottom, margin = 28.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }
         ) {
             AnimatedVisibility(
-                visible = isVisibleText4,
+                visible = isVisibleText3,
                 enter = slideInVertically(
                     initialOffsetY = { it },
                     animationSpec = tween(durationMillis = 500)
@@ -450,6 +432,8 @@ fun CaptureScreenshotScreen11(
             ) {
                 val ( progress, text1, text2, text3, text4) = createRefs()
                 val letter1TopGuideline = createGuidelineFromTop(0.3f)
+                val letter1StartGuideline = createGuidelineFromStart(0.2f)
+                val letter1EndGuideline = createGuidelineFromEnd(0.2f)
                 val letter2TopGuideline = createGuidelineFromTop(0.55f)
                 Image(
                     painter = painterResource(R.drawable.bg11),
@@ -462,8 +446,8 @@ fun CaptureScreenshotScreen11(
                     modifier = Modifier
                         .constrainAs(text1) {
                             top.linkTo(letter1TopGuideline)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
+                            start.linkTo(letter1StartGuideline)
+                            end.linkTo(letter1EndGuideline)
                         }
                 ) {
                     AnimatedVisibility(
@@ -479,8 +463,8 @@ fun CaptureScreenshotScreen11(
                     ) {
                         TextEffectView(
                             modifier = Modifier,
-                            "Người Kiến Tạo\nDoanh Số",
-                            textHighLight = listOf("Người Kiến Tạo\n" + "Doanh Số"),
+                            "Người Kiến Tạo Doanh Số",
+                            textHighLight = listOf("Người Kiến Tạo Doanh Số"),
                             configTextHighLight = ConfigText(
                                 colorMain,
                                 30.sp,
@@ -637,7 +621,7 @@ fun Dialog11Preview(){
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 123,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

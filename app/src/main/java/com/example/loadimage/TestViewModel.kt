@@ -35,9 +35,7 @@ class TestViewModel: ViewModel() {
                 throw Exception("Không thể lưu ảnh vào bộ nhớ cache.")
             }
         }
-            .onEach { uri ->
-                _uriFlow.value = uri
-            }
+
 
     }
 

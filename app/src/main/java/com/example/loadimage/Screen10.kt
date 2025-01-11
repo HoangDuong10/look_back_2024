@@ -610,7 +610,7 @@ fun Dialog10Preview(){
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 1234,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

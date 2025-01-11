@@ -29,6 +29,10 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import java.io.File
 import java.io.FileOutputStream
+import java.text.DecimalFormat
+import java.text.NumberFormat
+import java.util.Locale
+import kotlin.math.floor
 
 fun Int.isValid(
     list: List<Pair<Int, Int>>
@@ -127,6 +131,43 @@ private fun saveImageToSpecialApp(
         }
 
 }
+
+//fun Long.formatNumber(): String {
+//    return try {
+//        if (this >= 1_000_000_000) {
+//            val billions = this / 1_000_000_000.0
+//            val formatter = DecimalFormat("#,##0.##")
+//            "${formatter.format(billions)} Tỷ"
+//        } else {
+//            val formatter = NumberFormat.getInstance(Locale.GERMANY) as DecimalFormat
+//            formatter.applyPattern("###,###,###")
+//            formatter.format(this)
+//        }
+//    } catch (e: Exception) {
+//        e.printStackTrace()
+//        "0"
+//    }
+//}
+
+fun Long.formatNumber(): String {
+    return try {
+        if (this >= 1_000_000_000) {
+            val billions = this / 1_000_000_000.0
+            val truncated = floor(billions * 100) / 100 // Cắt bỏ phần dư, không làm tròn
+            val formatter = DecimalFormat("#,##0.##")
+            "${formatter.format(truncated)} Tỷ"
+        } else {
+            val formatter = NumberFormat.getInstance(Locale.GERMANY) as DecimalFormat
+            formatter.applyPattern("###,###,###")
+            formatter.format(this)
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        "0"
+    }
+}
+
+
 
 @Composable
 fun shareImageWithResult(

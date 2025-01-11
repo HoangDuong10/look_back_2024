@@ -35,12 +35,14 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Popup
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.media3.common.MediaItem
@@ -180,6 +182,8 @@ fun Screen5(
             }
     ) {
         val ( progress, text1, text2, text4, ivShare) = createRefs()
+        val letter1StartGuideline = createGuidelineFromStart(0.2f)
+        val letter1EndGuideline = createGuidelineFromEnd(0.2f)
         val letterTopGuideline = createGuidelineFromTop(0.45f)
         AndroidView(
             factory = {
@@ -207,8 +211,6 @@ fun Screen5(
             modifier = Modifier
                 .constrainAs(text1) {
                     top.linkTo(letterTopGuideline)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
                 }
         ) {
             AnimatedVisibility(
@@ -246,10 +248,12 @@ fun Screen5(
 
         Box(
             modifier = Modifier.padding(top=6.dp)
+                .background(Color.Red)
                 .constrainAs(text2) {
                     top.linkTo(text1.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
+                    start.linkTo(letter1StartGuideline)
+                    end.linkTo(letter1EndGuideline)
+                    width = Dimension.fillToConstraints
                 }
         ) {
             AnimatedVisibility(
@@ -266,12 +270,16 @@ fun Screen5(
                 if (this.transition.currentState == this.transition.targetState) {
                     isVisibleText3 = true
                 }
-                Text(
-                    text = data.data?.name?:"",
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 40.sp,
-                    color = colorResource(R.color.main_color),
-                )
+
+                   Text(
+                       text = data.data?.name?:"",
+                       fontWeight = FontWeight.Medium,
+                       fontSize = 40.sp,
+                       color = colorResource(R.color.main_color),
+                       textAlign = TextAlign.Center,
+                       modifier = Modifier.fillMaxWidth()
+                   )
+
 
             }
         }
@@ -407,6 +415,8 @@ fun CaptureScreenshotScreen5(
             ) {
                 val ( progress, text1, text2, text4,) = createRefs()
                 val letterTopGuideline = createGuidelineFromTop(0.45f)
+                val letter1StartGuideline = createGuidelineFromStart(0.2f)
+                val letter1EndGuideline = createGuidelineFromEnd(0.2f)
                 Image(
                     painter = painterResource(R.drawable.bg5),
                     contentDescription = null,
@@ -458,8 +468,8 @@ fun CaptureScreenshotScreen5(
                     modifier = Modifier.padding(top=6.dp)
                         .constrainAs(text2) {
                             top.linkTo(text1.bottom)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
+                            start.linkTo(letter1StartGuideline)
+                            end.linkTo(letter1EndGuideline)
                         }
                 ) {
                     AnimatedVisibility(
@@ -553,7 +563,7 @@ fun Dialog5Preview(){
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 32124,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.util.Log
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
@@ -19,6 +20,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +28,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -34,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -196,12 +202,20 @@ fun Screen2(
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+
     LaunchedEffect(isVideoPlaying) {
         if (exoPlayer.currentPosition > 0L && isVideoPlaying) {
             delay(2000 - exoPlayer.currentPosition)
             isVisibleText1 = true
         }
     }
+    var count by remember { mutableStateOf(0L) }
+LaunchedEffect(Unit) {
+    count = System.currentTimeMillis()
+    Log.d("timetest2","${count}")
+}
+
+    var lastClickTime by remember { mutableStateOf(0L) }
     val captureController = rememberCaptureController()
     Box() {
         Capturable(
@@ -225,6 +239,22 @@ fun Screen2(
                     .fillMaxSize()
                     .background(Color.Green)
                     .pointerInput(Unit) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            val (x, y) = dragAmount
+
+                            when {
+                                y > 0 -> {
+                                    if (y > 20 && x > -10 && x < 10) {
+                                        (context as? Activity)?.finish()
+                                    }
+                                }
+
+                                y < 0 -> {}
+                            }
+                        }
+                    }
+                    .pointerInput(Unit) {
                         val maxWidth = this.size.width
                         detectTapGestures(
                             onPress = {
@@ -236,7 +266,8 @@ fun Screen2(
 //                        isVideoPlaying = true
                                 val pressEndTime = System.currentTimeMillis()
                                 val totalPressTime = pressEndTime - pressStartTime
-                                if (totalPressTime < 200) {
+                                Log.d("timetest2","${count} + ${pressStartTime} + ${pressStartTime-count}")
+                                if (totalPressTime < 200 ) {
                                     val isTapOnRightThreeQuarters = (it.x > (maxWidth / 4))
                                     if (isTapOnRightThreeQuarters) {
                                         goToNextScreen()
@@ -248,7 +279,41 @@ fun Screen2(
                         )
                     }
             ) {
-                val (box, progress, text1, text2, text4, text5, ivShare) = createRefs()
+//                AnimatedVisibility(
+//                    visible = true,
+//                    enter = scaleIn(
+//                        initialScale = 0.2f,
+//                        animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+//                    ),
+//                    exit = scaleOut(
+//                        targetScale = 1f,
+//                        animationSpec = tween(durationMillis = LookBackConstants.TIME_SCREEN_1)
+//                    )
+//                ) {
+//                    TextEffectView(
+//                        modifier = Modifier,
+//                        "Nhìn lại 2024 bạn đã có 1 \n hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                                " hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n" +
+//                                " hành trình thật ấn tượng Nhìn lại 2024 bạn đã có 1 \n"
+//                            ,
+//                        textHighLight = listOf(),
+//                        configTextHighLight = ConfigText(
+//                            Color.Black,
+//                            18.sp,
+//                            FontWeight.Medium
+//                        ),
+//                        configTextNormal = ConfigText(
+//                            Color.Black,
+//                            18.sp,
+//                            FontWeight.Medium
+//                        ),
+//                        isShowFull = false,
+//                        isVideoPlaying = true
+//                    ) {
+//
+//                    }
+//                }
+                val (box, progress, text1, text2, text4, text5, ivShare,imgClose) = createRefs()
                 val letterTopGuideline = createGuidelineFromTop(0.45f)
                 Box(Modifier.fillMaxSize()) {
                     AndroidView(
@@ -337,7 +402,7 @@ fun Screen2(
                         }
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(style = ParagraphStyle(lineHeight = 21.sp)) {
+                                withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
                                     withStyle(
                                         style = SpanStyle(
                                             fontWeight = FontWeight.Bold,
@@ -372,7 +437,7 @@ fun Screen2(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }
-                        .offset(y = (-10).dp)
+                        .offset(y = (-8).dp)
                 ) {
                     AnimatedVisibility(
                         visible = isVisibleText3,
@@ -420,6 +485,25 @@ fun Screen2(
                     config,
                     videoUris.toInt() + 5000,
                     goToNextScreen
+                )
+                IconButton(
+                    onClick = {
+                        (context as? Activity)?.finish()
+                    },
+                    modifier = Modifier
+                        .constrainAs(imgClose) {
+                            top.linkTo(parent.top, 32.dp)
+                            end.linkTo(parent.end, 15.dp)
+                        }
+                        .size(26.dp),
+                    content = {
+                        Icon(
+                            modifier = Modifier.fillMaxSize(),
+                            painter = painterResource(id = R.drawable.ic_close),
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
                 )
                 Box(
                     modifier = Modifier
@@ -523,6 +607,7 @@ fun CatureScreen(
     val captureController = rememberCaptureController()
     val context = LocalContext.current
     var isLayoutReady by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
     val shareLauncher = rememberShareLauncher(context) { success ->
         showPopup(success)
     }
@@ -540,7 +625,7 @@ fun CatureScreen(
 //            showPopup.invoke(false)
 //        }
 //    }
-    val currentUri = rememberUpdatedState(newValue = uri)
+
 
 //    uri?.let { nonNullUri ->
 ////        shareImageWithResult(context, nonNullUri) { success ->
@@ -564,7 +649,7 @@ fun CatureScreen(
                             .onEach {
                                 shareImage(context, shareLauncher, it)
                             }
-                            .launchIn(viewModel.scope)
+                            .launchIn(coroutineScope)
                     }
                 },
                 controller = captureController
@@ -720,7 +805,7 @@ fun dialogPreview() {
     val fakeData = FakeData(
         order = "12345",
         topNhaBan = "Top 100",
-        doanhthu = "100,000,000",
+        doanhthu = 123455,
         thang = "6",
         name = "John Doe",
         slKhachHang = "150",
